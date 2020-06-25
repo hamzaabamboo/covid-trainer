@@ -48,8 +48,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "chalk": "^4.1.0",
-    "execa": "^4.0.2"
-  }
+  "homepage": "http://hamzabamboo.github.io/covid-trainer"
 }
