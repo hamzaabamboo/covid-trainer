@@ -1,0 +1,40 @@
+.moving-background {
+  -webkit-animation: AnimationName 10s ease infinite;
+  -moz-animation: AnimationName 10s ease infinite;
+  animation: AnimationName 10s ease infinite;
+  background-size: 300% 300% !important;
+}
+
+@-webkit-keyframes AnimationName {
+  0% {
+    background-position: 0% 10%;
+  }
+  50% {
+    background-position: 100% 91%;
+  }
+  100% {
+    background-position: 0% 10%;
+  }
+}
+@-moz-keyframes AnimationName {
+  0% {
+    background-position: 0% 10%;
+  }
+  50% {
+    background-position: 100% 91%;
+  }
+  100% {
+    background-position: 0% 10%;
+  }
+}
+@keyframes AnimationName {
+  0% {
+    background-position: 0% 10%;
+  }
+  50% {
+    background-position: 100% 91%;
+  }
+  100% {
+    background-position: 0% 10%;
+  }
+}
