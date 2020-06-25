@@ -12,9 +12,9 @@ const thirdLog = `${emoji.get("rocket")} ${chalk.green(
   try {
     await execa.command("git checkout --orphan gh-pages");
     console.log(firstLog);
-    await execa.command("npm run build");
-    await execa.command("git --work-tree dist add --all");
-    await execa.command('git --work-tree dist commit -m "gh-pages"');
+    await execa.command("cd web && npm run build");
+    await execa.command("git --work-tree ./web/dist add --all");
+    await execa.command('git --work-tree commit -m "gh-pages"');
     console.log(secondLog);
     await execa.command("git push origin HEAD:gh-pages --force");
     await execa.command("rm -r dist");
