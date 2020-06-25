@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useContext } from "react";
+import React, { useState, useEffect, useMemo, useContext, useRef } from "react";
 import { getSummary, ISummaryData } from "./api";
 // import { useWindowsSize } from "./useWindowSize";
 import { useLocalStorage } from "./useLocalStorage";
@@ -16,9 +16,12 @@ export const Home: React.FC<{}> = () => {
   const [data, setData] = useState<ISummaryData>();
   const [filterText, setFilterText] = useState<string>("");
   const [level, setLevel] = useLocalStorage<Levels>("userLevel", null);
-  const [, setFirebaseUser] = useFirestoreDocument<IUser>(
+  const firebaseRef = useRef<firebase.firestore.DocumentReference>(
     firestore().collection("users").doc(user?.uid)
   );
+
+  // const waifus = useWaifus();
+  const [, setFirebaseUser] = useFirestoreDocument<IUser>(firebaseRef.current);
 
   const showLevelModal = useMemo(() => {
     if (level === null) {
@@ -43,7 +46,7 @@ export const Home: React.FC<{}> = () => {
     if (level !== null && user) {
       setFirebaseUser({ level }, true);
     }
-  }, [level, user]);
+  }, [level, user, firebaseRef, setFirebaseUser]);
 
   useEffect(() => {
     getSummary().then((res) => setData(res.data));
@@ -51,7 +54,7 @@ export const Home: React.FC<{}> = () => {
 
   const loading = <p>Loading...</p>;
   const countries = React.useMemo(() => {
-    return filteredCountryList.map((country) => {
+    return filteredCountryList.map((country, index) => {
       return (
         <CardItem key={country.CountryCode}>
           {country.Country} ({country.CountryCode}) :{" "}
@@ -67,7 +70,7 @@ export const Home: React.FC<{}> = () => {
         className="flex w-full min-h-screen justify-center items-center flex-col"
         onKeyDown={(e) => {}}
       >
-        <h1 className="text-6xl">Covid Trainer !!!</h1>
+        <h1 className="text-6xl">Covid Trainer</h1>
         <p className="text-l text-bold">Hello, {user?.name}</p>
         <div>
           Current Level : {level}
@@ -92,7 +95,7 @@ export const Home: React.FC<{}> = () => {
             <p className="text-3xl text-bold">
               Global cases : {formatN(data?.Global.TotalConfirmed)}
             </p>
-            <div className="max-w-xl">{countries}</div>
+            <div className="max-w-xl p-4">{countries}</div>
           </>
         ) : (
           loading

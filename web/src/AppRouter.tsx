@@ -1,9 +1,10 @@
 import React from "react";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { Home } from "./Home";
 import { Navigation } from "./components/Navigation";
 
 import "./styles.scss";
+import { Profile } from "./Profile";
 
 const randomNum = (min: number, max: number) =>
   Math.round(Math.random() * (max - min) + min);
@@ -25,14 +26,20 @@ export const AppRouter: React.FC<{}> = () => {
         className="flex moving-background"
         style={{
           marginBottom: "64px",
+          height: "calc(100vh - 64px)",
           ...colors,
           mixBlendMode: "difference",
         }}
       >
         <div className="flex-grow overflow-scroll">
-          <Route path="/">
-            <Home />
-          </Route>
+          <Switch>
+            <Route path="/profile">
+              <Profile />
+            </Route>
+            <Route path="/">
+              <Home />
+            </Route>
+          </Switch>
         </div>
         <Navigation />
       </div>

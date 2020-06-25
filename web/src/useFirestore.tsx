@@ -5,12 +5,11 @@ export const useFirestoreDocument = <T,>(
   const [current, _setCurrent] = useState<T | undefined>(undefined);
 
   useEffect(() => {
-    console.log("effect !");
     const unsubscribe = ref.onSnapshot((snapshot) => {
       _setCurrent(snapshot.data() as T);
     });
     return unsubscribe;
-  }, []);
+  }, [ref]);
 
   const setCurrent = useCallback(
     async (newData: Partial<T>, update: boolean = true) => {

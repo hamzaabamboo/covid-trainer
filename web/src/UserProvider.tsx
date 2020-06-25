@@ -40,7 +40,9 @@ export const UserProvider: React.FC = ({ children }) => {
       }
     });
   }, []);
-  const signOut = () => {
+
+  const signOut = async () => {
+    await auth().signOut();
     setUser(undefined);
   };
 
