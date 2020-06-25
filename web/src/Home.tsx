@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import { getSummary, ISummaryData } from "./api";
-import { useWindowsSize } from "./useWindowSize";
+// import { useWindowsSize } from "./useWindowSize";
 import { useLocalStorage } from "./useLocalStorage";
 import { Levels, repsData } from "./types";
 import { Modal } from "./components/Modal";
@@ -8,13 +8,15 @@ import { CardItem } from "./components/CardItem";
 import { firestore } from "firebase";
 import { UserContext, IUser } from "./UserProvider";
 import { useFirestoreDocument } from "./useFirestore";
+import { useKey } from "./useKey";
 
+export const formatN = (n: number) => new Intl.NumberFormat("en-us").format(n);
 export const Home: React.FC<{}> = () => {
   const { user } = useContext(UserContext);
   const [data, setData] = useState<ISummaryData>();
   const [filterText, setFilterText] = useState<string>("");
   const [level, setLevel] = useLocalStorage<Levels>("userLevel", null);
-  const [firebaseUser, setFirebaseUser] = useFirestoreDocument<IUser>(
+  const [, setFirebaseUser] = useFirestoreDocument<IUser>(
     firestore().collection("users").doc(user?.uid)
   );
 
@@ -25,7 +27,7 @@ export const Home: React.FC<{}> = () => {
     return false;
   }, [level]);
 
-  const size = useWindowsSize();
+  // const size = useWindowsSize();
   const filteredCountryList = useMemo<ISummaryData["Countries"]>(() => {
     return (
       data?.Countries.filter((contry) =>
@@ -34,6 +36,9 @@ export const Home: React.FC<{}> = () => {
     ).filter((e) => repsData[level ?? "h"]?.(e.NewConfirmed));
   }, [filterText, data, level]);
 
+  useKey("h", () => {
+    setLevel("h");
+  });
   useEffect(() => {
     if (level !== null && user) {
       setFirebaseUser({ level }, true);
@@ -45,17 +50,23 @@ export const Home: React.FC<{}> = () => {
   }, []);
 
   const loading = <p>Loading...</p>;
-  const countries = filteredCountryList.map((country) => {
-    return (
-      <CardItem key={country.CountryCode}>
-        {country.Country} ({country.CountryCode}) : {country.NewConfirmed} cases
-      </CardItem>
-    );
-  });
+  const countries = React.useMemo(() => {
+    return filteredCountryList.map((country) => {
+      return (
+        <CardItem key={country.CountryCode}>
+          {country.Country} ({country.CountryCode}) :{" "}
+          {formatN(country.NewConfirmed)} cases
+        </CardItem>
+      );
+    });
+  }, [filteredCountryList]);
 
   return (
     <>
-      <div className="flex w-full min-h-screen justify-center items-center flex-col">
+      <div
+        className="flex w-full min-h-screen justify-center items-center flex-col"
+        onKeyDown={(e) => {}}
+      >
         <h1 className="text-6xl">Covid Trainer !!!</h1>
         <p className="text-l text-bold">Hello, {user?.name}</p>
         <div>
@@ -79,7 +90,7 @@ export const Home: React.FC<{}> = () => {
         {data !== undefined ? (
           <>
             <p className="text-3xl text-bold">
-              Global cases, {data?.Global.TotalConfirmed}
+              Global cases : {formatN(data?.Global.TotalConfirmed)}
             </p>
             <div className="max-w-xl">{countries}</div>
           </>
