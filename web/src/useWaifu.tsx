@@ -17,6 +17,5 @@ export const useWaifus = (): string[] => {
     });
   }, []);
 
-  useEffect(() => console.log(images), [images]);
   return images;
 };

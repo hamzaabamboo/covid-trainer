@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useContext, useRef } from "react";
-import { getSummary, ISummaryData } from "./api";
+import { ISummaryData } from "./api";
 // import { useWindowsSize } from "./useWindowSize";
 import { useLocalStorage } from "./useLocalStorage";
 import { Levels, repsData } from "./types";
@@ -9,13 +9,16 @@ import { firestore } from "firebase";
 import { UserContext, IUser } from "./UserProvider";
 import { useFirestoreDocument } from "./useFirestore";
 import { useKey } from "./useKey";
+import { useCovidSummary } from "./useCovidSummary";
+import { CustomLink } from "./components/CustomLink";
+import { LoadingSpinner } from "./components/LoadingSpinner";
 
 export const formatN = (n: number) => new Intl.NumberFormat("en-us").format(n);
 export const Home: React.FC<{}> = () => {
   const { user } = useContext(UserContext);
-  const [data, setData] = useState<ISummaryData>();
   const [filterText, setFilterText] = useState<string>("");
   const [level, setLevel] = useLocalStorage<Levels>("userLevel", null);
+  const { data } = useCovidSummary();
   const firebaseRef = useRef<firebase.firestore.DocumentReference>(
     firestore().collection("users").doc(user?.uid)
   );
@@ -42,23 +45,22 @@ export const Home: React.FC<{}> = () => {
   useKey("h", () => {
     setLevel("h");
   });
+
   useEffect(() => {
     if (level !== null && user) {
       setFirebaseUser({ level }, true);
     }
   }, [level, user, firebaseRef, setFirebaseUser]);
 
-  useEffect(() => {
-    getSummary().then((res) => setData(res.data));
-  }, []);
-
-  const loading = <p>Loading...</p>;
+  const loading = <LoadingSpinner />;
   const countries = React.useMemo(() => {
     return filteredCountryList.map((country, index) => {
       return (
         <CardItem key={country.CountryCode}>
-          {country.Country} ({country.CountryCode}) :{" "}
-          {formatN(country.NewConfirmed)} cases
+          <CustomLink to={`/train/${country.CountryCode}`}>
+            {country.Country} ({country.CountryCode}) :{" "}
+            {formatN(country.NewConfirmed)} cases
+          </CustomLink>
         </CardItem>
       );
     });
@@ -67,10 +69,10 @@ export const Home: React.FC<{}> = () => {
   return (
     <>
       <div
-        className="flex w-full min-h-screen justify-center items-center flex-col"
-        onKeyDown={(e) => {}}
+        className="flex w-full min-h-full justify-start
+       items-center flex-col"
       >
-        <h1 className="text-6xl">Covid Trainer</h1>
+        <h1 className="text-6xl mt-2">Covid Trainer</h1>
         <p className="text-l text-bold">Hello, {user?.name}</p>
         <div>
           Current Level : {level}
@@ -95,7 +97,7 @@ export const Home: React.FC<{}> = () => {
             <p className="text-3xl text-bold">
               Global cases : {formatN(data?.Global.TotalConfirmed)}
             </p>
-            <div className="max-w-xl p-4">{countries}</div>
+            <div className="max-w-md p-4">{countries}</div>
           </>
         ) : (
           loading

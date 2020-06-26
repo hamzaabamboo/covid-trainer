@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { auth, firestore } from "firebase";
 import { Levels } from "./types";
+import { LoadingSpinner } from "./components/LoadingSpinner";
 export interface IUser {
   name: string;
   uid: string;
@@ -51,6 +52,6 @@ export const UserProvider: React.FC = ({ children }) => {
       {children}
     </UserContext.Provider>
   ) : (
-    <div>Loading...</div>
+    <LoadingSpinner />
   );
 };

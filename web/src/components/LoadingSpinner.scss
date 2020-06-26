@@ -1,0 +1,38 @@
+@function max($numbers...) {
+  @return m#{a}x(#{$numbers});
+}
+
+.spinme {
+  height: max(200vh, 200vw);
+  width: max(200vh, 200vw);
+  animation: Spinnn 2s linear infinite;
+  transform: scale(5);
+}
+
+.zoomme {
+  animation: Zoom 3s ease-in-out infinite;
+}
+
+@keyframes Zoom {
+  0% {
+    transform: perspective(0) scale(0.5);
+  }
+  50% {
+    transform: perspective(99px) scale(2.5);
+  }
+  100% {
+    transform: perspective(0) scale(0.5);
+  }
+}
+
+@keyframes Spinnn {
+  0% {
+    transform: rotate(0deg) scale(2);
+  }
+  50% {
+    transform: rotate(180deg) scale(2);
+  }
+  100% {
+    transform: rotate(360deg) scale(2);
+  }
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { firestore } from "firebase";
 export const useFirestoreDocument = <T,>(
   ref: firebase.firestore.DocumentReference
 ): [T | undefined, (newData: Partial<T>, update: boolean) => void] => {
@@ -23,4 +24,105 @@ export const useFirestoreDocument = <T,>(
   );
 
   return [current, setCurrent];
+};
+
+export type WithId<T> = T & { id: string };
+export const useFirestoreCollection = <T,>(
+  ref: firebase.firestore.CollectionReference
+): [WithId<T>[] | undefined, (newData: T) => void, (delId: string) => void] => {
+  const [current, _setCurrent] = useState<WithId<T>[] | undefined>(undefined);
+
+  const updateCurrent = useCallback(
+    (snapshot: firestore.QuerySnapshot<firestore.DocumentData>) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const doc = { id: change.doc.id, ...(change.doc.data() as T) };
+          _setCurrent((current) =>
+            current !== undefined ? [...current, doc] : [doc]
+          );
+        } else if (change.type === "removed") {
+          _setCurrent((current) =>
+            current?.filter(({ id }) => id !== change.doc.id)
+          );
+        } else if (change.type === "modified") {
+          _setCurrent((current) =>
+            current?.map((c) =>
+              c.id !== change.doc.id
+                ? c
+                : { id: change.doc.id, ...(change.doc.data() as T) }
+            )
+          );
+        }
+      });
+    },
+    []
+  );
+
+  useEffect(() => {
+    const unsubscribe = ref.onSnapshot(updateCurrent);
+    return () => {
+      unsubscribe();
+      _setCurrent(undefined);
+    };
+  }, [ref, updateCurrent]);
+
+  const add = useCallback(
+    async (newData: T) => {
+      await ref.add(newData);
+    },
+    [ref]
+  );
+
+  const remove = useCallback(
+    async (id: string) => {
+      await ref.doc(id).delete();
+    },
+    [ref]
+  );
+
+  return [current, add, remove];
+};
+
+export const useFirestoreQuery = <T,>(
+  ref: firebase.firestore.Query | undefined
+): [WithId<T>[] | undefined] => {
+  const [current, _setCurrent] = useState<WithId<T>[] | undefined>(undefined);
+
+  const updateCurrent = useCallback(
+    (snapshot: firestore.QuerySnapshot<firestore.DocumentData>) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const doc = { id: change.doc.id, ...(change.doc.data() as T) };
+          _setCurrent((current) =>
+            current !== undefined ? [...current, doc] : [doc]
+          );
+        } else if (change.type === "removed") {
+          _setCurrent((current) =>
+            current?.filter(({ id }) => id !== change.doc.id)
+          );
+        } else if (change.type === "modified") {
+          _setCurrent((current) =>
+            current?.map((c) =>
+              c.id !== change.doc.id
+                ? c
+                : { id: change.doc.id, ...(change.doc.data() as T) }
+            )
+          );
+        }
+      });
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (ref) {
+      const unsubscribe = ref.onSnapshot(updateCurrent);
+      return () => {
+        unsubscribe();
+        _setCurrent(undefined);
+      };
+    }
+  }, [ref, updateCurrent]);
+
+  return [current];
 };

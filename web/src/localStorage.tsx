@@ -4,7 +4,7 @@ export class LocalStorage<T = any> {
   get value(): T | null {
     try {
       const val = localStorage.getItem(this.key);
-      return JSON.parse(val || '');
+      return val !== null ? JSON.parse(val) : null;
     } catch (error) {
       return null;
     }
