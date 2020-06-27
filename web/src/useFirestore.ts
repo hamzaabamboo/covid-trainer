@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { firestore } from "firebase";
-export const useFirestoreDocument = <T,>(
+export const useFirestoreDocument = <T>(
   ref: firebase.firestore.DocumentReference
 ): [T | undefined, (newData: Partial<T>, update: boolean) => void] => {
   const [current, _setCurrent] = useState<T | undefined>(undefined);
@@ -27,7 +27,7 @@ export const useFirestoreDocument = <T,>(
 };
 
 export type WithId<T> = T & { id: string };
-export const useFirestoreCollection = <T,>(
+export const useFirestoreCollection = <T>(
   ref: firebase.firestore.CollectionReference
 ): [WithId<T>[] | undefined, (newData: T) => void, (delId: string) => void] => {
   const [current, _setCurrent] = useState<WithId<T>[] | undefined>(undefined);
@@ -83,10 +83,11 @@ export const useFirestoreCollection = <T,>(
   return [current, add, remove];
 };
 
-export const useFirestoreQuery = <T,>(
+export const useFirestoreQuery = <T>(
   ref: firebase.firestore.Query | undefined
-): [WithId<T>[] | undefined] => {
+): [WithId<T>[] | undefined, boolean] => {
   const [current, _setCurrent] = useState<WithId<T>[] | undefined>(undefined);
+  const [isLoading, _setLoading] = useState(false);
 
   const updateCurrent = useCallback(
     (snapshot: firestore.QuerySnapshot<firestore.DocumentData>) => {
@@ -117,6 +118,13 @@ export const useFirestoreQuery = <T,>(
   useEffect(() => {
     if (ref) {
       const unsubscribe = ref.onSnapshot(updateCurrent);
+      _setLoading(true);
+      const data = ref.get().then((s) => {
+        _setCurrent(
+          s.docs.map((doc) => ({ id: doc.id, ...(doc.data() as T) }))
+        );
+        _setLoading(false);
+      });
       return () => {
         unsubscribe();
         _setCurrent(undefined);
@@ -124,5 +132,5 @@ export const useFirestoreQuery = <T,>(
     }
   }, [ref, updateCurrent]);
 
-  return [current];
+  return [current, isLoading];
 };

@@ -18,7 +18,7 @@ export const Profile: React.FC = () => {
         : undefined,
     [user]
   );
-  const [sessions] = useFirestoreQuery<IReps>(repsRef);
+  const [sessions, sessionLoading] = useFirestoreQuery<IReps>(repsRef);
 
   return (
     <div className="min-h-full w-screen flex flex-col justify-center items-center ">
@@ -37,13 +37,18 @@ export const Profile: React.FC = () => {
             Roggu Auto
           </button>
           <h1 className="text-2xl py-2">Past Training Sessions</h1>
-          {sessions?.map((session) => {
-            return (
-              <CardItem key={session.id}>
-                {session.country} ({session.countryCode}) : {session.reps} reps
-              </CardItem>
-            );
-          }) ?? <LoadingSpinner />}
+          {!sessionLoading ? (
+            sessions?.map((session) => {
+              return (
+                <CardItem key={session.id}>
+                  {session.country} ({session.countryCode}) : {session.reps}{" "}
+                  reps
+                </CardItem>
+              );
+            })
+          ) : (
+            <LoadingSpinner />
+          )}
         </div>
       )}
     </div>
