@@ -2,7 +2,6 @@ import React, { useRef, useMemo } from "react";
 import { IUser } from "./UserProvider";
 import { firestore } from "firebase";
 import { useFirestoreQuery } from "./useFirestore";
-import { useLog } from "./useLog";
 import { useUsers } from "./useUsers";
 import { CardItem } from "./components/CardItem";
 import { LoadingSpinner } from "./components/LoadingSpinner";
@@ -19,25 +18,18 @@ export interface IReps {
 export const Leaderboard: React.FC = () => {
   // const { user } = useContext(UserContext);
   const leaderboardRef = useRef(
-    firestore().collection("reps").orderBy("reps", "desc")
+    firestore().collection("leaderboard").orderBy("reps", "desc")
   );
   const [_leaderboard] = useFirestoreQuery<IReps>(leaderboardRef.current);
   const usersMap = useUsers();
 
   const leaderboard: (IUser & { reps: number })[] | undefined = useMemo(() => {
-    let acc: { [user: string]: number } = {};
-    _leaderboard?.forEach((entry) => {
-      if (!(entry.user in acc)) {
-        acc[entry.user] = 0;
-      }
-      acc[entry.user] += entry.reps;
-    });
     return _leaderboard
-      ? Object.entries(acc).map(([id, reps]) => ({ ...usersMap[id], reps }))
+      ? _leaderboard
+          .map(({ id, reps }) => ({ ...usersMap[id], reps }))
+          .sort((a, b) => a.reps - b.reps)
       : undefined;
   }, [_leaderboard, usersMap]);
-
-  useLog(leaderboard, usersMap);
 
   return (
     <div className="min-h-full w-screen flex flex-col justify-start items-center ">

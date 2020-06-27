@@ -3,7 +3,6 @@ import { UserContext } from "./UserProvider";
 import { firestore } from "firebase";
 import { useFirestoreQuery } from "./useFirestore";
 import { IReps } from "./Leaderboard";
-import { useLog } from "./useLog";
 import { CardItem } from "./components/CardItem";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 
@@ -21,11 +20,10 @@ export const Profile: React.FC = () => {
   );
   const [sessions] = useFirestoreQuery<IReps>(repsRef);
 
-  useLog(sessions);
   return (
     <div className="min-h-full w-screen flex flex-col justify-center items-center ">
       {user && (
-        <div className="max-w-md ">
+        <div className="max-w-md p-4 pt-8">
           <img
             src={user.photo}
             className="rounded-full w-32"
@@ -38,7 +36,7 @@ export const Profile: React.FC = () => {
           >
             Roggu Auto
           </button>
-          <h1 className="text-4xl">Your Training Sessions</h1>
+          <h1 className="text-2xl py-2">Past Training Sessions</h1>
           {sessions?.map((session) => {
             return (
               <CardItem key={session.id}>

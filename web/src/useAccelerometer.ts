@@ -28,6 +28,7 @@ export const useAccelerometer = (frequency: number = 60) => {
     sensor.start();
 
     return () => {
+      sensor.removeEventListener("reading", handleEvent);
       sensor.stop();
     };
   }, [frequency]);
