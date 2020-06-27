@@ -37,7 +37,7 @@ export const Leaderboard: React.FC = () => {
         <h1 className="text-4xl my-4">Leaderboard</h1>
         {leaderboard ? (
           leaderboard?.map((entry, index) => (
-            <CardItem key={entry.uid}>
+            <CardItem key={entry.uid ?? index}>
               <div className="w-full flex flex-row">
                 <img
                   className="rounded-full h-16 w-auto block mr-4"
