@@ -12,7 +12,7 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-router-dom": "^5.1.5",
     "@types/w3c-generic-sensor": "^1.0.2",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "customize-cra": "^1.0.0",
     "customize-cra-react-refresh": "^1.1.0",
     "firebase": "^7.15.4",
