@@ -1,7 +1,9 @@
 import { useRef } from "react";
-import { useFirestoreCollection } from "./useFirestore";
 import { firestore } from "firebase";
-import { IUser } from "./UserProvider";
+
+import { IUser } from "../UserProvider";
+
+import { useFirestoreCollection } from "./useFirestore";
 
 export const useUsers = () => {
   const usersRef = useRef(firestore().collection("users"));

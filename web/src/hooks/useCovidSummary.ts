@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getSummary, ISummaryData } from "./api";
+import { getSummary, ISummaryData } from "../api";
 
 export const useCovidSummary = () => {
   const [data, setData] = useState<ISummaryData>();

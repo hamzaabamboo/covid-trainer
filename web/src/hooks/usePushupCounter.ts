@@ -1,6 +1,5 @@
-import { useState, useRef, useMemo, useEffect, useCallback } from "react";
-import { useAccelerometer } from "./useAccelerometer";
-import { useLog } from "./useLog";
+import { useState, useRef, useEffect } from "react";
+import { useLog } from "../hooks/useLog";
 
 // const _sensor = new LinearAccelerationSensor({
 //   frequency: 30,

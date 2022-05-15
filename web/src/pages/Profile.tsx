@@ -1,21 +1,24 @@
 import React, { useContext, useMemo } from "react";
-import { UserContext } from "./UserProvider";
 import { firestore } from "firebase";
-import { useFirestoreQuery } from "./useFirestore";
+
 import { IReps } from "./Leaderboard";
-import { CardItem } from "./components/CardItem";
-import { LoadingSpinner } from "./components/LoadingSpinner";
+
+import { UserContext } from "../UserProvider";
+
+import { CardItem } from "../components/CardItem";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+
+import { useFirestoreQuery } from "../hooks/useFirestore";
 
 export const Profile: React.FC = () => {
   const { user, signOut } = useContext(UserContext);
   const repsRef = useMemo(
-    () =>
-      user?.uid
-        ? firestore()
-            .collection("reps")
-            .where("user", "==", user?.uid)
-            .orderBy("timestamp", "desc")
-        : undefined,
+    () => user?.uid ?
+      firestore()
+        .collection("reps")
+        .where("user", "==", user?.uid)
+        .orderBy("timestamp", "desc") :
+      undefined,
     [user]
   );
   const [sessions, sessionLoading] = useFirestoreQuery<IReps>(repsRef);
